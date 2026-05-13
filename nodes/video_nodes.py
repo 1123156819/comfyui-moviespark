@@ -5,7 +5,6 @@
 """
 
 import os
-import subprocess
 import torch
 import numpy as np
 import folder_paths
@@ -63,31 +62,18 @@ class SaveVideoNoMetaData:
         raise ValueError(f"不支持的视频类型: {type(video)} (类名: {video_type})")
 
     def _save_as_mp4(self, video_uint8, filepath, fps):
-        import subprocess
-        h, w = video_uint8.shape[1], video_uint8.shape[2]
-        cmd = [
-            'ffmpeg', '-y', '-f', 'rawvideo', '-vcodec', 'rawvideo',
-            '-s', f'{w}x{h}', '-pix_fmt', 'rgb24',
-            '-r', str(float(fps)), '-i', '-',
-            '-c:v', 'libx264', '-preset', 'medium', '-crf', '19',
-            '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
-            filepath
-        ]
-        subprocess.run(cmd, input=video_uint8.tobytes(), check=True,
-                       capture_output=True)
+        import imageio
+        writer = imageio.get_writer(filepath, fps=float(fps), codec='libx264', pixelformat='yuv420p', quality=8)
+        for frame in video_uint8:
+            writer.append_data(frame)
+        writer.close()
 
     def _save_as_webm(self, video_uint8, filepath, fps):
-        import subprocess
-        h, w = video_uint8.shape[1], video_uint8.shape[2]
-        cmd = [
-            'ffmpeg', '-y', '-f', 'rawvideo', '-vcodec', 'rawvideo',
-            '-s', f'{w}x{h}', '-pix_fmt', 'rgb24',
-            '-r', str(float(fps)), '-i', '-',
-            '-c:v', 'libvpx-vp9', '-crf', '30', '-b:v', '0',
-            '-pix_fmt', 'yuv420p', filepath
-        ]
-        subprocess.run(cmd, input=video_uint8.tobytes(), check=True,
-                       capture_output=True)
+        import imageio
+        writer = imageio.get_writer(filepath, fps=float(fps), codec='libvpx', pixelformat='yuv420p', quality=8)
+        for frame in video_uint8:
+            writer.append_data(frame)
+        writer.close()
 
     def _save_as_gif(self, video_uint8, filepath, fps):
         from PIL import Image
@@ -139,13 +125,13 @@ class SaveVideoNoMetaData:
         elif fmt == "webm":
             try:
                 self._save_as_webm(video_uint8, filepath, fps)
-            except (subprocess.CalledProcessError, FileNotFoundError):
+            except Exception:
                 self._save_as_gif(video_uint8, filepath.replace('.webm', '.gif'), fps)
                 file = file.replace('.webm', '.gif')
         else:
             try:
                 self._save_as_mp4(video_uint8, filepath, fps)
-            except (subprocess.CalledProcessError, FileNotFoundError):
+            except Exception:
                 self._save_as_gif(video_uint8, filepath.replace('.mp4', '.gif'), fps)
                 file = file.replace('.mp4', '.gif')
         
