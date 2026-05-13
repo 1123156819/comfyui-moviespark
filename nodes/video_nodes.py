@@ -22,8 +22,8 @@ class SaveVideoNoMetaData:
             "required": {
                 "video": ("VIDEO", ),
                 "filename_prefix": ("STRING", {"default": "tacosai-video"}),
-                "format": (["auto", "mp4", "webm", "gif"], {"default": "auto"}),
-                "codec": (["auto", "h264", "vp9", "gif"], {"default": "auto"}),
+                "format": (["auto", "mp4", "webm"], {"default": "auto"}),
+                "codec": (["auto", "h264", "vp9"], {"default": "auto"}),
                 "save_metadata": ("BOOLEAN", {"default": False}),
                 "overwrite": ("BOOLEAN", {"default": True}),
             },
@@ -120,20 +120,10 @@ class SaveVideoNoMetaData:
         os.makedirs(full_output_folder, exist_ok=True)
         filepath = os.path.join(full_output_folder, file)
         
-        if fmt == "gif":
-            self._save_as_gif(video_uint8, filepath, fps)
-        elif fmt == "webm":
-            try:
-                self._save_as_webm(video_uint8, filepath, fps)
-            except Exception:
-                self._save_as_gif(video_uint8, filepath.replace('.webm', '.gif'), fps)
-                file = file.replace('.webm', '.gif')
+        if fmt == "webm":
+            self._save_as_webm(video_uint8, filepath, fps)
         else:
-            try:
-                self._save_as_mp4(video_uint8, filepath, fps)
-            except Exception:
-                self._save_as_gif(video_uint8, filepath.replace('.mp4', '.gif'), fps)
-                file = file.replace('.mp4', '.gif')
+            self._save_as_mp4(video_uint8, filepath, fps)
         
         last_frame = torch.from_numpy(video_uint8[-1].astype(np.float32) / 255.0)
         
