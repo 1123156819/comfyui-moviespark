@@ -1,0 +1,17 @@
+# ComfyUI-MovieSpark 依赖
+# 基础依赖（ComfyUI已包含）
+torch
+numpy
+Pillow
+
+# 视频处理
+imageio
+imageio-ffmpeg
+
+# 音频处理
+librosa
+soundfile
+
+# 可选依赖（用于高级功能）
+# moviepy - 视频编辑备用方案
+# transformers - 用于AI生成描述

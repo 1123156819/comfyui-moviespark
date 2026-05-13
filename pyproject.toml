@@ -1,0 +1,18 @@
+[project]
+name = "comfyui-moviespark"
+version = "1.0.0"
+description = "ComfyUI custom nodes package - MovieSpark (替代 tacosai 加密节点)"
+authors = [
+    {name = "MovieSpark Team"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+[project.urls]
+Repository = "https://github.com/proximaxai/comfyui-moviespark"
+
+[tool.comfy]
+PublisherId = "proximaxai"
+DisplayName = "ComfyUI-MovieSpark"
+Icon = ""
